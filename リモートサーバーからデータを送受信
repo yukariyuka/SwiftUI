@@ -1,0 +1,40 @@
+struct Response: Codable {
+  var results: [Result]
+}
+
+
+struct Result: Codable {
+  var id: UUID
+  var name: String
+  var age: Int
+}
+
+
+struct ContentView: View {
+  @State private var results = [Result]()
+  
+  var body: some View {
+    List(results, id: \.id) { result in
+      VStack(alignment: .leading) {
+        Text(result.name)
+          .font(.headline)
+        Text(String(age))
+      }
+      .task {
+        await loadData()
+      }
+    }
+  }
+
+func loadData() async {
+  guard let url = URL(string: "https:........") else {
+    print("Invalid")
+    return
+  }
+  
+  do {
+  let (data, _) = try await URLSession.shared.data(from: url)
+  if let decodedResponse = try? JSONDecoder().decode(Response.self, from:data) {
+    results = decodedResponse.results
+  }
+}
